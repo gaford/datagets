@@ -6,7 +6,7 @@ _YES = ['Y', 'y', 'yes', 'Yes']
 _NO = ['N', 'n', 'no', 'No']
 _QUIT = ['q', 'Q', 'quit', 'Quit']
 
-def dataframe_cleaner(dataframe, confirmation="stepwise"):
+def manual_dataframe_cleaner(dataframe, confirmation="stepwise"):
     """
     A method for selecting, retyping, and renaming the columns of a pandas dataframe.
 
@@ -19,8 +19,15 @@ def dataframe_cleaner(dataframe, confirmation="stepwise"):
 
     Returns
     -------
-    pandas.DataFrame
-        The new dataframe
+    modified_dataframe : pandas.DataFrame
+        The new dataframe containing the modified columns
+    chosen_columns : list
+        The columns selected from the *original* dataframe
+    modified_columns : list
+        The new names for the chosen columns
+    modified_dtypes : dict
+        The new dtypes for the chosen columns
+
 
     """
 
@@ -31,6 +38,8 @@ def dataframe_cleaner(dataframe, confirmation="stepwise"):
     old_columns = dataframe.columns
     old_dtypes = dataframe.dtypes
     N = len(old_columns)
+
+    chosen_columns = []
 
     new_columns = []
     new_dtypes = []
@@ -65,6 +74,8 @@ def dataframe_cleaner(dataframe, confirmation="stepwise"):
                 print("Invalid input:  {0}".format(keep))
 
         if keep in _YES + ['']:
+            # mark as chosen
+            chosen_columns.append(old_name)
 
             # establish confirmation loop
             while not confirmed:
@@ -82,8 +93,8 @@ def dataframe_cleaner(dataframe, confirmation="stepwise"):
                         new_type = old_type
 
                     try:
-                         new_series = dataframe[old_name].astype(new_type)
-                         valid = True
+                        new_series = dataframe[old_name].astype(new_type)
+                        valid = True
                     except TypeError:
                         print("Invalid type:  {0}".format(new_type))
                     except ValueError:
@@ -137,6 +148,15 @@ def dataframe_cleaner(dataframe, confirmation="stepwise"):
             print()
             break
 
+    # compile the output
+    modified_dataframe = pd.DataFrame(out_dict)
+    modified_columns = [col for col in new_columns if col]
+    modified_dtypes_list = [dtype for dtype in new_dtypes if dtype]
+    modified_dtypes = dict(zip(modified_columns, modified_dtypes_list))
+
+    out = (modified_dataframe, chosen_columns, modified_columns, modified_dtypes)
+
+    # run through ending confirmation if called
     if confirmation == 'end':
         print("-" * 80)
 
@@ -159,11 +179,11 @@ def dataframe_cleaner(dataframe, confirmation="stepwise"):
                 print("Invalid input:  {0}".format(correct))
 
         if correct in _YES + ['']:
-            return pd.DataFrame(out_dict)
+            return out
         else:
             raise Exception("Failed input!  Try again.")
 
-    return pd.DataFrame(out_dict)
+    return out
 
 
 
