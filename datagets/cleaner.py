@@ -48,8 +48,9 @@ def manual_dataframe_cleaner(dataframe, confirmation="stepwise"):
     out_dict = OrderedDict()
 
     # initizliating
+    window_width = 80
     print("Beginning to clean.")
-    print("=" * 80)
+    print("=" * window_width)
 
     for j in range(N):
         old_name = old_columns[j]
@@ -58,7 +59,7 @@ def manual_dataframe_cleaner(dataframe, confirmation="stepwise"):
 
         # print separator
         if j != 0:
-            print("=" * 80)
+            print("=" * window_width)
 
         # print column information
         print("Column {0:{width}} of {1:{width}}".format(j+1, N, width=N_digits))
@@ -163,7 +164,7 @@ def manual_dataframe_cleaner(dataframe, confirmation="stepwise"):
 
     # run through ending confirmation if called
     if confirmation == 'end':
-        print("*" * 80)
+        print("=" * window_width)
 
         for j in range(N):
             if new_columns[j]:
@@ -184,12 +185,12 @@ def manual_dataframe_cleaner(dataframe, confirmation="stepwise"):
                 print("Invalid input:  {0}".format(correct))
 
         if correct in _YES + ['']:
-            print("=" * 80)
+            print("=" * window_width)
             print("Cleaning completed.")
             return out
         else:
             raise Exception("Incorrect input!  Try again.")
 
-    print("=" * 80)
+    print("=" * window_width)
     print("Cleaning completed.")
     return out
