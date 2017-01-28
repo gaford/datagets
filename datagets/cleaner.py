@@ -38,6 +38,7 @@ def manual_dataframe_cleaner(dataframe, confirmation="stepwise"):
     old_columns = dataframe.columns
     old_dtypes = dataframe.dtypes
     N = len(old_columns)
+    N_digits = len(str(N))
 
     chosen_columns = []
 
@@ -46,6 +47,10 @@ def manual_dataframe_cleaner(dataframe, confirmation="stepwise"):
 
     out_dict = OrderedDict()
 
+    # initizliating
+    print("Beginning to clean.")
+    print("=" * 80)
+
     for j in range(N):
         old_name = old_columns[j]
         old_type = old_dtypes[j]
@@ -53,10 +58,11 @@ def manual_dataframe_cleaner(dataframe, confirmation="stepwise"):
 
         # print separator
         if j != 0:
-            print("-" * 80)
+            print("=" * 80)
 
         # print column information
-        print("Column {0} of {1}".format(j+1, N))
+        print("Column {0:{width}} of {1:{width}}".format(j+1, N, width=N_digits))
+        print("-" * (11 + 2*N_digits))
         print("Column name:  {0}".format(old_name))
         print("Column type:  {0}".format(old_type))
 
@@ -145,20 +151,19 @@ def manual_dataframe_cleaner(dataframe, confirmation="stepwise"):
             new_dtypes.extend(remainder)
 
             print("Quitting cleaning process.")
-            print()
             break
 
     # compile the output
     modified_dataframe = pd.DataFrame(out_dict)
-    modified_columns = [col for col in new_columns if col]
-    modified_dtypes_list = [dtype for dtype in new_dtypes if dtype]
+    modified_columns = [col for col in new_columns if col is not None]
+    modified_dtypes_list = [dtype for dtype in new_dtypes if dtype is not None]
     modified_dtypes = dict(zip(modified_columns, modified_dtypes_list))
 
     out = (modified_dataframe, chosen_columns, modified_columns, modified_dtypes)
 
     # run through ending confirmation if called
     if confirmation == 'end':
-        print("-" * 80)
+        print("*" * 80)
 
         for j in range(N):
             if new_columns[j]:
@@ -179,11 +184,12 @@ def manual_dataframe_cleaner(dataframe, confirmation="stepwise"):
                 print("Invalid input:  {0}".format(correct))
 
         if correct in _YES + ['']:
+            print("=" * 80)
+            print("Cleaning completed.")
             return out
         else:
-            raise Exception("Failed input!  Try again.")
+            raise Exception("Incorrect input!  Try again.")
 
+    print("=" * 80)
+    print("Cleaning completed.")
     return out
-
-
-
